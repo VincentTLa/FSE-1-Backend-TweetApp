@@ -4,12 +4,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/*
+ * The model framework for a User
+ */
 @Document("users")
 public class User {
 
+	/*
+	 * The user's primary key, which is used for search queries
+	 */
 	@Id
 	private String id;
 	
+	/*
+	 * The user's details containing their First Name, Last Name
+	 * Email, Password, Contact Number and profile image
+	 * 
+	 */
 	private String firstName;
 	private String lastName;
 	

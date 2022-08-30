@@ -13,19 +13,21 @@ public class Tweet {
 	private String username;
 	private String description;
 	private String datetime;
-	private int likes;
+	private String tag;
+	private List<Like> likes;
 	private List<Tweet> replies;
 	
 	public Tweet() {
 		
 	}
 
-	public Tweet(String username, String description, String datetime, int likes) {
+	public Tweet(String username, String description, String datetime, List<Like> likes, String tag) {
 		super();
 		this.username = username;
 		this.description = description;
 		this.datetime = datetime;
 		this.likes = likes;
+		this.setTag(tag);
 	}
 
 	public String getId() {
@@ -44,11 +46,11 @@ public class Tweet {
 		this.username = username;
 	}
 
-	public int getLikes() {
+	public List<Like> getLikes() {
 		return likes;
 	}
 
-	public void setLikes(int likes) {
+	public void setLikes(List<Like> likes) {
 		this.likes = likes;
 	}
 
@@ -75,6 +77,14 @@ public class Tweet {
 
 	public void setReplies(List<Tweet> replies) {
 		this.replies = replies;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	@Override
