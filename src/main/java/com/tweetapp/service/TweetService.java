@@ -1,6 +1,7 @@
 package com.tweetapp.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -28,8 +29,8 @@ public class TweetService {
 
 	public List<Tweet> getAllTweets() {
 		// Sorts the list of all tweets by date time in descending order
-		List<Tweet> listOfTweets = tweetRepo.findAll(Sort.by(Direction.DESC, "datetime"));
-
+		List<Tweet> listOfTweets = tweetRepo.findAll();
+		Collections.sort(listOfTweets, (o1, o2) -> o1.getDatetime().compareTo(o2.getDatetime()));
 		if (listOfTweets.isEmpty()) {
 			log.info("Returned a list of empty Tweets.");
 		}
@@ -58,23 +59,19 @@ public class TweetService {
 	public Tweet updateTweet(String username, String tweetId, Tweet theTweet) {
 
 		// Checks if the Tweet exists
-		if (checkIfTweetExists(tweetId)) {
-			Tweet originalTweet = getTweetById(tweetId);
-			List<Like> likes = originalTweet.getLikes();
-			// Set the username and tweetId so a new tweet is not created
-			theTweet.setUsername(username);
-			theTweet.setId(tweetId);
+		checkIfTweetExists(tweetId);
+		Tweet originalTweet = getTweetById(tweetId);
+		List<Like> likes = originalTweet.getLikes();
+		// Set the username and tweetId so a new tweet is not created
+		theTweet.setUsername(username);
+		theTweet.setId(tweetId);
 
-			theTweet.setLikes(likes);
+		theTweet.setLikes(likes);
 
-			save(username, theTweet);
-			log.info("Updated tweet with id: '{}'", tweetId);
-			return theTweet;
+		save(username, theTweet);
+		log.info("Updated tweet with id: '{}'", tweetId);
+		return theTweet;
 
-		} else {
-			log.info("Tweet not found");
-			throw new ResourceNotFoundException("Tweet could not be found!");
-		}
 	}
 
 	public Tweet replyToTweet(String username, String tweetId, Tweet replyTweet) {
@@ -109,29 +106,23 @@ public class TweetService {
 	}
 
 	public void deleteTweet(String tweetId) {
-		// Checks if tweet exists
-		if (checkIfTweetExists(tweetId)) {
-			
-			Tweet theTweet = getTweetById(tweetId);
-			setReplyField(theTweet);
 
-			// Check if tweet has replies
-			if (!theTweet.getReplies().isEmpty()) {
-				// Delete the replies of main tweet
-				for (Tweet replies : theTweet.getReplies()) {
-					tweetRepo.deleteById(replies.getId());
-					log.info("Deleting reply with id: {}", replies.getId());
-				}
+		Tweet theTweet = tweetRepo.findTweetById(tweetId);
+		setReplyField(theTweet);
+
+		// Check if tweet has replies
+		if (!theTweet.getReplies().isEmpty()) {
+			// Delete the replies of main tweet
+			for (Tweet replies : theTweet.getReplies()) {
+				tweetRepo.deleteById(replies.getId());
+				log.info("Deleting reply with id: {}", replies.getId());
 			}
-
-			// Deletes the tweet using Tweet's id
-			tweetRepo.deleteById(tweetId);
-			log.info("Deleted the tweet with id: {}", tweetId);
-
-		} else {
-			log.info("Could not find the Tweet with id: {}", tweetId);
-			throw new ResourceNotFoundException("Could not find the tweet!");
 		}
+
+		// Deletes the tweet using Tweet's id
+		tweetRepo.deleteById(tweetId);
+		log.info("Deleted the tweet with id: {}", tweetId);
+
 	}
 
 	public boolean likeTweet(String username, String tweetId) {
