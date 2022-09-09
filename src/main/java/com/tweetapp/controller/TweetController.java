@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tweetapp.models.Tweet;
-import com.tweetapp.producer.Producer;
 import com.tweetapp.service.TweetService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +26,6 @@ public class TweetController {
 
 	@Autowired
 	private TweetService tweetService;
-
-	@Autowired
-	private Producer producer;
 
 	// Retrieve all tweets
 	@GetMapping("/all")
@@ -71,7 +67,7 @@ public class TweetController {
 	// Delete a tweet
 	@DeleteMapping("/{username}/delete/{tweetId}")
 	public void deleteTweet(@PathVariable String tweetId) {
-		producer.sendMessage(tweetId);
+		tweetService.deleteTweet(tweetId);
 	}
 
 	// Like a tweet
